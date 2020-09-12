@@ -8,3 +8,7 @@ def index():
 @app.route("/about")
 def about():
     return "All about Flask"
+
+@app.route("/websocket-demo")
+def websocketDemo():
+    return render_template("websockets.html")
