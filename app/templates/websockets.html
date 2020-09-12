@@ -8,17 +8,52 @@
     <title>Index</title>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
-    <script type="text/javascript" charset="utf-8">
-        var socket = io();
-        socket.on('connect', function() {
-            console.log('client connected')
-            socket.emit('message', {data: 'I\'m connected!'});
-        });
-    </script>
 </head>
 
 <body>
     <h1>Websocket Demo</h1>
+    <button id="save-button">Save Data</button>
+    <button id="test-message">Echo Test Message</button>
+
+    <pre id="log">messages:</pre>
+
+    <script type="text/javascript" charset="utf-8">
+        var saveButton = document.getElementById("save-button");
+        var testButton = document.getElementById("test-message");
+        var logEl = document.getElementById("log");
+
+        const getLogger = (eventName, next = () => null) => (...args) => {
+            console.log(`[logger][${eventName}]`, ...args);
+
+            return next(...args);
+        }
+
+        var socket = io();
+        socket.on('connect', getLogger('connect', appendMessage));
+        socket.on('disconnect', getLogger('disconnect', appendMessage));
+
+        socket.on('message', getLogger('message', appendMessage));
+
+        socket.on('echo', getLogger('echo', appendMessage));
+
+        socket.on('progress', getLogger('progress', appendMessage));
+
+        function appendMessage(...args) {
+            logEl.innerText += '\n' + args.join('\n');
+        }
+
+        const saveData = () => {
+            var testData = {
+                a: 'prop',
+                b: true,
+            };
+
+            socket.emit('save:json', testData);
+        }
+
+        testButton.onclick = () => socket.emit('echo', 'a test message')
+        saveButton.onclick = saveData;
+    </script>
 </body>
 
 </html>
