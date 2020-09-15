@@ -11,3 +11,5 @@ pip install -r requirements.txt
 # start app
 python run.py
 ```
+
+![websocket-gif](./docs/resources/websocket-demo.gif)
